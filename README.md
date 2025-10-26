@@ -149,6 +149,10 @@ This is designed as a personal productivity tool. If you'd like to suggest impro
 - **Browser Memory**: Close other tabs if the app feels slow
 - **Storage Space**: Check available storage if import/export fails
 
+<img width="1668" height="890" alt="Screenshot 2025-10-26 at 12 28 46 AM" src="https://github.com/user-attachments/assets/74e9b9a4-e928-429f-8377-e30822eb052f" />
+<img width="1681" height="887" alt="Screenshot 2025-10-26 at 12 27 51 AM" src="https://github.com/user-attachments/assets/b5d74f27-ab8b-4503-9bdb-2513c2571056" />
+
+
 ## 📄 License
 
 MIT License
