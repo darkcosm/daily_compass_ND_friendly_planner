@@ -1685,6 +1685,37 @@
         }
 
         // ============================================================================
+        // ENTRY CONTENT VALIDATION (FIX FOR STREAK BUG)
+        // ============================================================================
+
+        function isEntryMeaningful(entry) {
+            if (!entry) return false;
+            
+            // Check if mood is selected
+            if (entry.mood) return true;
+            
+            // Check if energy is selected  
+            if (entry.energy) return true;
+            
+            // Check text content (trim to remove just whitespace)
+            const textFields = ['wins', 'gratitude', 'thoughts', 'tomorrow', 'exercise', 'water', 'sleep', 'meds'];
+            for (const field of textFields) {
+                if (entry[field] && entry[field].trim().length > 0) return true;
+            }
+            
+            // Check if any self-care items are checked
+            if (entry.selfCare && Array.isArray(entry.selfCare) && entry.selfCare.some(item => item)) return true;
+            
+            // Check if any hygiene items are checked  
+            if (entry.hygiene && Array.isArray(entry.hygiene) && entry.hygiene.some(item => item)) return true;
+            
+            // Check if any tasks are completed
+            if (entry.tasks && Array.isArray(entry.tasks) && entry.tasks.some(task => task.completed)) return true;
+            
+            return false;
+        }
+
+        // ============================================================================
         // WORK TASKS
         // ============================================================================
 
@@ -2427,7 +2458,7 @@
         }
 
         // ============================================================================
-        // STATISTICS
+        // STATISTICS (WITH FIXED STREAK CALCULATION)
         // ============================================================================
 
         function updateStats() {
@@ -2437,12 +2468,15 @@
 
             request.onsuccess = () => {
                 const entries = request.result;
-                const totalEntries = entries.length;
+                
+                // Only count entries with meaningful content
+                const meaningfulEntries = entries.filter(entry => isEntryMeaningful(entry));
+                const totalEntries = meaningfulEntries.length;
                 
                 document.getElementById('totalEntriesDisplay').textContent = totalEntries;
                 
-                // Calculate streak
-                const sortedDates = entries
+                // Calculate streak based on meaningful entries only
+                const sortedDates = meaningfulEntries
                     .map(e => new Date(e.date))
                     .sort((a, b) => b - a);
 
@@ -2468,16 +2502,17 @@
 
                 longestStreak = Math.max(longestStreak, tempStreak);
 
-                // Current streak from today backwards
+                // Current streak from today backwards (FIXED)
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 let checkDate = new Date(today);
                 
                 while (true) {
                     const dateStr = getDateString(checkDate);
-                    const hasEntry = entries.some(e => e.date === dateStr);
+                    const entry = entries.find(e => e.date === dateStr);
+                    const hasMeaningfulContent = entry && isEntryMeaningful(entry);
                     
-                    if (hasEntry) {
+                    if (hasMeaningfulContent) {
                         currentStreak++;
                         checkDate.setDate(checkDate.getDate() - 1);
                     } else {
