@@ -2086,7 +2086,30 @@
         // ============================================================================
 
         function changeDay(delta) {
-            saveEntry();
+            // Only save current day if it has meaningful content
+            const tempEntry = {
+                date: getDateString(currentDate),
+                mood: currentMood,
+                energy: currentEnergy,
+                moodNotes: safeGetValue('moodNotesText'),
+                wins: safeGetValue('winsText'),
+                gratitude: safeGetValue('gratitudeText'),
+                thoughts: safeGetValue('thoughtsText'),
+                tomorrow: safeGetValue('tomorrowText'),
+                exercise: safeGetValue('exerciseTracker'),
+                water: safeGetValue('waterTracker'),
+                sleep: safeGetValue('sleepTracker'),
+                meds: safeGetValue('medsTracker'),
+                selfCare: getCurrentSelfCareState(),
+                hygiene: getCurrentHygieneState(),
+                tasks: tasks.map(t => ({ ...t })),
+                lastModified: new Date().toISOString()
+            };
+            
+            if (isEntryMeaningful(tempEntry)) {
+                saveEntry();
+            }
+            
             currentDate.setDate(currentDate.getDate() + delta);
             updateDateDisplay();
             loadEntry(getDateString(currentDate));
@@ -2137,13 +2160,25 @@
                 lastModified: new Date().toISOString()
             };
 
-            const transaction = db.transaction(['entries'], 'readwrite');
-            const store = transaction.objectStore('entries');
-            store.put(entry);
+            // Only save if the entry has meaningful content
+            if (isEntryMeaningful(entry)) {
+                const transaction = db.transaction(['entries'], 'readwrite');
+                const store = transaction.objectStore('entries');
+                store.put(entry);
 
-            transaction.oncomplete = () => {
-                updateStats();
-            };
+                transaction.oncomplete = () => {
+                    updateStats();
+                };
+            } else {
+                // If no meaningful content, remove the entry if it exists
+                const transaction = db.transaction(['entries'], 'readwrite');
+                const store = transaction.objectStore('entries');
+                store.delete(dateKey);
+                
+                transaction.oncomplete = () => {
+                    updateStats();
+                };
+            }
         }
 
         function loadEntry(dateKey) {
@@ -2637,12 +2672,30 @@
             settingsStore.clear();
 
             transaction.oncomplete = () => {
-                showStatus('All data cleared');
+                // Reset all in-memory state
+                tasks = [];
+                currentMood = null;
+                currentEnergy = null;
+                focusSessionsToday = 0;
+                focusMinutesToday = 0;
+                breaksTaken = 0;
+                
+                // Clear the UI
                 clearForm();
                 document.getElementById('persistentNotes').value = '';
+                
+                // Reset timer stats display
+                document.getElementById('focusSessionsToday').textContent = '0';
+                document.getElementById('focusMinutesToday').textContent = '0';
+                document.getElementById('breaksTaken').textContent = '0';
+                
+                // Reload default checklists and empty tasks
                 loadSelfCareItems();
                 loadHygieneItems();
+                renderTasks(); // This will show empty task list
                 updateStats();
+                
+                showStatus('All data cleared');
             };
         }
 
@@ -2650,17 +2703,60 @@
         // AUTO-SAVE
         // ============================================================================
 
-        // Auto-save every 30 seconds
+        // Auto-save every 30 seconds - only if there's meaningful content
         setInterval(() => {
             if (db) {
-                saveEntry();
+                // Only auto-save if there's meaningful content
+                const tempEntry = {
+                    date: getDateString(currentDate),
+                    mood: currentMood,
+                    energy: currentEnergy,
+                    moodNotes: safeGetValue('moodNotesText'),
+                    wins: safeGetValue('winsText'),
+                    gratitude: safeGetValue('gratitudeText'),
+                    thoughts: safeGetValue('thoughtsText'),
+                    tomorrow: safeGetValue('tomorrowText'),
+                    exercise: safeGetValue('exerciseTracker'),
+                    water: safeGetValue('waterTracker'),
+                    sleep: safeGetValue('sleepTracker'),
+                    meds: safeGetValue('medsTracker'),
+                    selfCare: getCurrentSelfCareState(),
+                    hygiene: getCurrentHygieneState(),
+                    tasks: tasks.map(t => ({ ...t })),
+                    lastModified: new Date().toISOString()
+                };
+                
+                if (isEntryMeaningful(tempEntry)) {
+                    saveEntry();
+                }
             }
         }, 30000);
 
-        // Save before page unload
+        // Save before page unload - only if there's meaningful content
         window.addEventListener('beforeunload', () => {
             if (db) {
-                saveEntry();
+                const tempEntry = {
+                    date: getDateString(currentDate),
+                    mood: currentMood,
+                    energy: currentEnergy,
+                    moodNotes: safeGetValue('moodNotesText'),
+                    wins: safeGetValue('winsText'),
+                    gratitude: safeGetValue('gratitudeText'),
+                    thoughts: safeGetValue('thoughtsText'),
+                    tomorrow: safeGetValue('tomorrowText'),
+                    exercise: safeGetValue('exerciseTracker'),
+                    water: safeGetValue('waterTracker'),
+                    sleep: safeGetValue('sleepTracker'),
+                    meds: safeGetValue('medsTracker'),
+                    selfCare: getCurrentSelfCareState(),
+                    hygiene: getCurrentHygieneState(),
+                    tasks: tasks.map(t => ({ ...t })),
+                    lastModified: new Date().toISOString()
+                };
+                
+                if (isEntryMeaningful(tempEntry)) {
+                    saveEntry();
+                }
             }
         });
 
