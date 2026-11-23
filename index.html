@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="A free, private daily planner from Her Own Terms. Note mood and energy, choose three things, and leave the rest in a brain dump. Your data stays in this browser.">
-    <meta name="theme-color" content="#F7F3EC">
+    <meta name="theme-color" content="#F4F1E9">
     <meta name="color-scheme" content="light">
     <meta property="og:title" content="Daily Compass">
     <meta property="og:description" content="A free, private daily planner from Her Own Terms. Mood, energy, three things, and a brain dump. Your data stays in this browser.">
@@ -54,12 +54,12 @@
         }
 
         :root {
-            --paper: #F7F3EC;
-            --raised: #FBFAF6;
-            --ink: #1A1714;
-            --ink-soft: #3C362F;
-            --muted: #4E483F;
-            --line: #E3D6C6;
+            --paper: #F4F1E9;
+            --raised: #FBFAF4;
+            --ink: #0A0A09;
+            --ink-soft: #2A2A28;
+            --muted: #4A4844;
+            --line: #D9D2C4;
             --accent: #C8362C;
             --focus: #C8362C;
         }
@@ -435,8 +435,51 @@
             letter-spacing: 0.04em;
         }
 
+        .invite {
+            margin-top: 2.75rem;
+            padding: 1.15rem 1.2rem 0.7rem;
+            border: 1px solid var(--line);
+            background: transparent;
+            min-width: 0;
+        }
+
+        .invite p { margin: 0; }
+
+        .invite-copy {
+            max-width: 38rem;
+            font-family: "Instrument Serif", Georgia, serif;
+            font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            line-height: 1.25;
+            color: var(--ink);
+        }
+
+        .invite-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.15rem 1.35rem;
+            margin-top: 0.35rem;
+        }
+
+        .invite-links a {
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            color: var(--ink);
+            font-family: "IBM Plex Mono", ui-monospace, monospace;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: underline;
+            text-underline-offset: 0.22em;
+        }
+
+        .invite-links a:hover { color: var(--accent); }
+
         footer {
-            margin-top: 2.5rem;
+            margin-top: 1.75rem;
             padding: 1.25rem 0 3rem;
             border-top: 1px solid var(--line);
             color: var(--ink-soft);
@@ -528,14 +571,14 @@
         }
 
         @media (prefers-contrast: more) {
-            :root { --line: #1A1714; --muted: #1A1714; }
+            :root { --line: #0A0A09; --muted: #0A0A09; }
             .choice span, textarea, .tick input, .btn { border-width: 2px; }
         }
 
         @media print {
             body { background: #fff; color: #111; }
 
-            .topbar, .skip, .wrap, dialog { display: none !important; }
+            .topbar, .skip, .wrap, .invite, dialog { display: none !important; }
 
             .print-only {
                 display: block !important;
@@ -702,6 +745,14 @@
                 <p class="status" id="status" role="status" aria-live="polite"></p>
             </section>
         </main>
+
+        <aside class="invite" aria-label="From Her Own Terms">
+            <p class="invite-copy">Made by Dr. Anna Maria at Her Own Terms. If this helps, there's more on building a business around how you work.</p>
+            <p class="invite-links">
+                <a href="https://substack.com/@herowntermsbuilds" target="_blank" rel="noopener noreferrer">Read the letters</a>
+                <a href="https://herownterms.me/#get-in-touch" target="_blank" rel="noopener noreferrer">Work with me</a>
+            </p>
+        </aside>
 
         <footer>
             <p>A free tool from <a href="https://herownterms.me">Her Own Terms</a></p>
